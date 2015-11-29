@@ -1,16 +1,10 @@
 package gitlabmr.idea.plugin.view;
 
-import com.intellij.diff.DiffContentFactory;
-import com.intellij.diff.DiffManager;
-import com.intellij.diff.contents.DiffContent;
-import com.intellij.diff.contents.EmptyContent;
-import com.intellij.diff.requests.SimpleDiffRequest;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.treeStructure.Tree;
-import gitlabmr.idea.plugin.bo.CommitDiffBo;
-import gitlabmr.idea.plugin.bo.MergeRequestBo;
+import gitlabmr.idea.plugin.bo.ClickableNode;
 import gitlabmr.idea.plugin.task.GetMergeRequestTask;
 
 import javax.swing.*;
@@ -32,32 +26,8 @@ public class MergeRequestListView extends JPanel {
                     DefaultMutableTreeNode parent = (DefaultMutableTreeNode) tp.getLastPathComponent();
                     Object component = parent.getUserObject();
 
-                    if (component instanceof MergeRequestBo) {
-                        MergeRequestBo mr = (MergeRequestBo) component;
-                        for (CommitDiffBo diff : mr.commitDiffBos) {
-                            DefaultMutableTreeNode node = new DefaultMutableTreeNode(diff);
-                            parent.add(node);
-                        }
-                        tree.treeDidChange();
-                    } else if (component instanceof CommitDiffBo) {
-                        MergeRequestBo mr = (MergeRequestBo)((DefaultMutableTreeNode) parent.getParent()).getUserObject();
-                        CommitDiffBo diff = (CommitDiffBo) component;
-
-                        DiffContent before = null;
-                        DiffContent after = null;
-                        if (diff.isFileAdded) {
-                            before = new EmptyContent();
-                            after = DiffContentFactory.getInstance().create(new String(diff.getNewFileContent(mr.targetBranchId)));
-                        } else if (diff.isFileDeleted) {
-                            before = DiffContentFactory.getInstance().create(new String(diff.getOldFileContent(mr.sourceBranchId)));
-                            after = new EmptyContent();
-                        } else {
-                            before = DiffContentFactory.getInstance().create(new String(diff.getOldFileContent(mr.sourceBranchId)));
-                            after = DiffContentFactory.getInstance().create(new String(diff.getNewFileContent(mr.targetBranchId)));
-                        }
-
-                        SimpleDiffRequest request = new SimpleDiffRequest("compare", before, after, mr.sourceBranchId + "(" + mr.sourceBranch + ")", mr.targetBranchId + "(" + mr.targetBranch + ")");
-                        DiffManager.getInstance().showDiff(project, request);
+                    if (component instanceof ClickableNode) {
+                        ((ClickableNode) component).doubleClick(project, tree, parent);
                     }
                 }
             }

@@ -1,12 +1,15 @@
 package gitlabmr.idea.plugin.bo;
 
+import com.intellij.openapi.project.Project;
+import com.intellij.ui.treeStructure.Tree;
 import gitlabmr.idea.plugin.model.Gitlab;
 import org.gitlab.api.models.GitlabMergeRequest;
 
+import javax.swing.tree.DefaultMutableTreeNode;
 import java.io.IOException;
 import java.util.List;
 
-public class MergeRequestBo {
+public class MergeRequestBo implements ClickableNode {
     public final ProjectBo projectBo;
     public final String name;
     public final String sourceBranch;
@@ -46,5 +49,14 @@ public class MergeRequestBo {
     @Override
     public String toString() {
         return name;
+    }
+
+    @Override
+    public void doubleClick(Project project, Tree tree, DefaultMutableTreeNode parent) {
+        for (CommitDiffBo diff : this.commitDiffBos) {
+            DefaultMutableTreeNode node = new DefaultMutableTreeNode(diff);
+            parent.add(node);
+        }
+        tree.treeDidChange();
     }
 }

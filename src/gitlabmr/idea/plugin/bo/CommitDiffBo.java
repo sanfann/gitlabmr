@@ -1,11 +1,19 @@
 package gitlabmr.idea.plugin.bo;
 
+import com.intellij.diff.DiffContentFactory;
+import com.intellij.diff.DiffManager;
+import com.intellij.diff.contents.DiffContent;
+import com.intellij.diff.contents.EmptyContent;
+import com.intellij.diff.requests.SimpleDiffRequest;
+import com.intellij.openapi.project.Project;
+import com.intellij.ui.treeStructure.Tree;
 import gitlabmr.idea.plugin.model.Gitlab;
 import org.gitlab.api.models.GitlabCommitDiff;
 
+import javax.swing.tree.DefaultMutableTreeNode;
 import java.io.IOException;
 
-public class CommitDiffBo {
+public class CommitDiffBo implements ClickableNode {
     public final boolean isFileAdded;
     public final boolean isFileDeleted;
     public final boolean isFileRenamed;
@@ -51,5 +59,28 @@ public class CommitDiffBo {
     @Override
     public String toString() {
         return oldFilePath + " ->" + newFilePath;
+    }
+
+    @Override
+    public void doubleClick(Project project, Tree tree, DefaultMutableTreeNode parent) {
+        MergeRequestBo mr = (MergeRequestBo)((DefaultMutableTreeNode) parent.getParent()).getUserObject();
+
+        DiffContent before;
+        DiffContent after;
+        if (isFileAdded) {
+            before = new EmptyContent();
+            after = DiffContentFactory.getInstance().create(new String(getNewFileContent(mr.targetBranchId)));
+        } else if (isFileDeleted) {
+            before = DiffContentFactory.getInstance().create(new String(getOldFileContent(mr.sourceBranchId)));
+            after = new EmptyContent();
+        } else {
+            before = DiffContentFactory.getInstance().create(new String(getOldFileContent(mr.sourceBranchId)));
+            after = DiffContentFactory.getInstance().create(new String(getNewFileContent(mr.targetBranchId)));
+        }
+
+        String beforeTitle = mr.sourceBranchId + "(" + mr.sourceBranch + ")";
+        String afterTitle = mr.targetBranchId + "(" + mr.targetBranch + ")";
+        SimpleDiffRequest request = new SimpleDiffRequest("compare", before, after, beforeTitle, afterTitle);
+        DiffManager.getInstance().showDiff(project, request);
     }
 }
