@@ -38,6 +38,5 @@ public class MergeRequestListView extends JPanel {
         this.setLayout(new BorderLayout());
         final JBScrollPane scroller = new JBScrollPane(tree, JBScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JBScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         this.add(scroller, BorderLayout.CENTER);
-
     }
 }
