@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.util.List;
 
 public class GetMergeRequestTask extends Task.Backgroundable {
-    private final  Tree tree;
+    private final Tree tree;
 
     public GetMergeRequestTask(@Nullable Project project, Tree tree) {
         super(project, "title");
