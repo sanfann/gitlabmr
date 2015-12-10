@@ -16,8 +16,12 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class MergeRequestListView extends JPanel {
+    private Project project;
+    private Tree tree;
+
     public MergeRequestListView(final Project project) {
-        final Tree tree = new Tree(new DefaultTreeModel(new DefaultMutableTreeNode()));
+        this.project = project;
+        tree = new Tree(new DefaultTreeModel(new DefaultMutableTreeNode()));
         tree.setRootVisible(false);
         tree.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
@@ -33,10 +37,14 @@ public class MergeRequestListView extends JPanel {
             }
         });
 
-        ProgressManager.getInstance().run(new GetMergeRequestTask(project, tree));
-
         this.setLayout(new BorderLayout());
         final JBScrollPane scroller = new JBScrollPane(tree, JBScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JBScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         this.add(scroller, BorderLayout.CENTER);
+
+        refresh(true);
+    }
+
+    public void refresh(boolean isSelfFilterOn) {
+        ProgressManager.getInstance().run(new GetMergeRequestTask(project, tree, isSelfFilterOn));
     }
 }

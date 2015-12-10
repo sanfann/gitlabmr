@@ -19,10 +19,12 @@ import java.util.List;
 
 public class GetMergeRequestTask extends Task.Backgroundable {
     private final Tree tree;
+    private final boolean isSelfFilterOn;
 
-    public GetMergeRequestTask(@Nullable Project project, Tree tree) {
+    public GetMergeRequestTask(@Nullable Project project, Tree tree, boolean isSelfFilterOn) {
         super(project, "title");
         this.tree = tree;
+        this.isSelfFilterOn = isSelfFilterOn;
     }
 
     private static TreeModel convertToTreeModel(List<ProjectBo> projects) {
@@ -48,7 +50,12 @@ public class GetMergeRequestTask extends Task.Backgroundable {
         indicator.setFraction(0.0);
 
         try {
-            final List<ProjectBo> projects = Gitlab.getProjectWithMergeRequests();
+            final List<ProjectBo> projects;
+            if (isSelfFilterOn) {
+                projects = Gitlab.getProjectWithSelfMergeRequests();
+            } else {
+                projects = Gitlab.getProjectWithMergeRequests();
+            }
             indicator.setFraction(0.8);
             SwingUtilities.invokeLater(new Runnable() {
                 @Override

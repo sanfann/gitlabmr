@@ -43,6 +43,23 @@ public class Gitlab {
         return projectBos;
     }
 
+    public static List<ProjectBo> getProjectWithSelfMergeRequests() throws IOException {
+        List<ProjectBo> projectBos = getProjects();
+
+        Integer userId = api.getUser().getId();
+        for (ProjectBo projectBo : projectBos) {
+            LinkedList<MergeRequestBo> mergeRequestBos = new LinkedList<MergeRequestBo>();
+            for (GitlabMergeRequest mr : api.getOpenMergeRequests(projectBo.id)) {
+                if (userId.equals(mr.getAssignee().getId())) {
+                    mergeRequestBos.add(getMergeRequestBoWithChanges(mr, projectBo));
+                }
+            }
+            projectBo.setMergeRequestBos(mergeRequestBos);
+        }
+
+        return projectBos;
+    }
+
     private static MergeRequestBo getMergeRequestBoWithChanges(GitlabMergeRequest mergeRequest, ProjectBo projectBo) throws IOException {
         GitlabMergeRequest mr = api.getMergeRequestChanges(mergeRequest.getProjectId(), mergeRequest.getId());
 

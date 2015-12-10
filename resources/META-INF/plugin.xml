@@ -31,8 +31,8 @@
   </extensions>
 
   <actions>
-    <action id="mrRefresh" class="gitlabmr.idea.plugin.action.MergeRequestRefresher" text="Refresh">
-    </action>
+    <action id="mrRefresh" class="gitlabmr.idea.plugin.action.MergeRequestRefresher" text="Refresh"/>
+    <action id="mrFilter" class="gitlabmr.idea.plugin.action.SelfMergeRequestFilter" text="Filter"/>
   </actions>
 
 </idea-plugin>
