@@ -6,6 +6,7 @@ import com.intellij.diff.contents.DiffContent;
 import com.intellij.diff.contents.EmptyContent;
 import com.intellij.diff.requests.SimpleDiffRequest;
 import com.intellij.openapi.project.Project;
+import com.intellij.testFramework.LightVirtualFile;
 import com.intellij.ui.treeStructure.Tree;
 import gitlabmr.idea.plugin.model.Gitlab;
 import org.gitlab.api.models.GitlabCommitDiff;
@@ -69,18 +70,31 @@ public class CommitDiffBo implements ClickableNode {
         DiffContent after;
         if (isFileAdded) {
             before = new EmptyContent();
-            after = DiffContentFactory.getInstance().create(new String(getNewFileContent(mr.targetBranchId)));
+            after = DiffContentFactory.getInstance().createFile(project,
+                                                                new LightVirtualFile(getFileName(newFilePath),
+                                                                                     new String(getNewFileContent(mr.targetBranchId))));
         } else if (isFileDeleted) {
-            before = DiffContentFactory.getInstance().create(new String(getOldFileContent(mr.sourceBranchId)));
+            before = DiffContentFactory.getInstance().createFile(project,
+                                                                 new LightVirtualFile(getFileName(oldFilePath),
+                                                                                      new String(getOldFileContent(mr.sourceBranchId))));
             after = new EmptyContent();
         } else {
-            before = DiffContentFactory.getInstance().create(new String(getOldFileContent(mr.sourceBranchId)));
-            after = DiffContentFactory.getInstance().create(new String(getNewFileContent(mr.targetBranchId)));
+            before = DiffContentFactory.getInstance().createFile(project,
+                                                                 new LightVirtualFile(getFileName(oldFilePath),
+                                                                                      new String(getOldFileContent(mr.sourceBranchId))));
+            after = DiffContentFactory.getInstance().createFile(project,
+                                                                new LightVirtualFile(getFileName(newFilePath),
+                                                                                     new String(getNewFileContent(mr.targetBranchId))));
         }
 
         String beforeTitle = mr.sourceBranchId + "(" + mr.sourceBranch + ")";
         String afterTitle = mr.targetBranchId + "(" + mr.targetBranch + ")";
         SimpleDiffRequest request = new SimpleDiffRequest("compare", before, after, beforeTitle, afterTitle);
         DiffManager.getInstance().showDiff(project, request);
+    }
+
+    private String getFileName(String path) {
+        String[] tokens = path.split("/");
+        return tokens[tokens.length - 1];
     }
 }
