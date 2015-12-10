@@ -59,7 +59,15 @@ public class CommitDiffBo implements ClickableNode {
 
     @Override
     public String toString() {
-        return oldFilePath + " ->" + newFilePath;
+        if (isFileAdded) {
+            return "(Added)" + newFilePath;
+        } else if (isFileDeleted) {
+            return "(Deleted)" + oldFilePath;
+        } else if (isFileRenamed) {
+            return "(Renamed)" + oldFilePath + " ->" + newFilePath;
+        } else {
+            return "(Modified)" + newFilePath;
+        }
     }
 
     @Override
@@ -72,19 +80,19 @@ public class CommitDiffBo implements ClickableNode {
             before = new EmptyContent();
             after = DiffContentFactory.getInstance().createFile(project,
                                                                 new LightVirtualFile(getFileName(newFilePath),
-                                                                                     new String(getNewFileContent(mr.targetBranchId))));
+                                                                                     new String(getNewFileContent(mr.sourceBranchId))));
         } else if (isFileDeleted) {
             before = DiffContentFactory.getInstance().createFile(project,
                                                                  new LightVirtualFile(getFileName(oldFilePath),
-                                                                                      new String(getOldFileContent(mr.sourceBranchId))));
+                                                                                      new String(getOldFileContent(mr.targetBranchId))));
             after = new EmptyContent();
         } else {
             before = DiffContentFactory.getInstance().createFile(project,
                                                                  new LightVirtualFile(getFileName(oldFilePath),
-                                                                                      new String(getOldFileContent(mr.sourceBranchId))));
+                                                                                      new String(getOldFileContent(mr.targetBranchId))));
             after = DiffContentFactory.getInstance().createFile(project,
                                                                 new LightVirtualFile(getFileName(newFilePath),
-                                                                                     new String(getNewFileContent(mr.targetBranchId))));
+                                                                                     new String(getNewFileContent(mr.sourceBranchId))));
         }
 
         String beforeTitle = mr.sourceBranchId + "(" + mr.sourceBranch + ")";
