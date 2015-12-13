@@ -6,7 +6,6 @@ import com.intellij.openapi.actionSystem.ToggleAction;
 import gitlabmr.idea.plugin.view.MergeRequestListView;
 
 public class SelfMergeRequestFilter extends ToggleAction {
-    private boolean state = true;
     private MergeRequestListView listView;
 
     public SelfMergeRequestFilter() {
@@ -19,12 +18,12 @@ public class SelfMergeRequestFilter extends ToggleAction {
 
     @Override
     public boolean isSelected(AnActionEvent e) {
-        return state;
+        return listView.isSelfFilterOn();
     }
 
     @Override
     public void setSelected(AnActionEvent e, boolean state) {
-        this.state = state;
-        listView.refresh(state);
+        listView.setSelfFilterOn(state);
+        listView.refresh();
     }
 }

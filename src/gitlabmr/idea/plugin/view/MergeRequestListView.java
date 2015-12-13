@@ -18,6 +18,7 @@ import java.awt.event.MouseEvent;
 public class MergeRequestListView extends JPanel {
     private Project project;
     private Tree tree;
+    private boolean isSelfFilterOn = true;
 
     public MergeRequestListView(final Project project) {
         this.project = project;
@@ -41,10 +42,18 @@ public class MergeRequestListView extends JPanel {
         final JBScrollPane scroller = new JBScrollPane(tree, JBScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JBScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         this.add(scroller, BorderLayout.CENTER);
 
-        refresh(true);
+        refresh();
     }
 
-    public void refresh(boolean isSelfFilterOn) {
+    public void refresh() {
         ProgressManager.getInstance().run(new GetMergeRequestTask(project, tree, isSelfFilterOn));
+    }
+
+    public void setSelfFilterOn(boolean selfFilterOn) {
+        isSelfFilterOn = selfFilterOn;
+    }
+
+    public boolean isSelfFilterOn() {
+        return isSelfFilterOn;
     }
 }
